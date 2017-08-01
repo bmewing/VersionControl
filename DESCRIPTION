@@ -11,5 +11,5 @@ License: Unlicensed
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
-URL: tba
-BugReports: tba
+URL: https://github.com/bmewing/VersionControl
+BugReports: https://github.com/bmewing/VersionControl/issues
