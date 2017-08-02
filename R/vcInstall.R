@@ -21,13 +21,13 @@ vcInstall <- function(package,version,type=c("source","windows","macosx"),search
   if(length(type) > 1) type = type[1]
   dl = defaultLibrary()
   if(!dir.exists(dl)){
-    cat("This appears to be your first time doing version controlled package installation.\nCreating a new directory at the location below to store versioned installation.\n",dl)
+    cat("This appears to be your first time doing version controlled package installation.\nCreating a new directory at the location below to store versioned installation.\n",dl,"\n")
     dir.create(dl)
   }
   for(i in seq_along(package)){
     vcpd = paste(dl,package[i],sep=.Platform$file.sep)
     if(!dir.exists(vcpd)){
-      cat("This appears to be the first time the package '",package[i],"' has been installed with version control.\nCreating a new directory at the location below to store versioned installations\n ",vcpd,sep="")
+      cat("This appears to be the first time the package '",package[i],"' has been installed with version control.\nCreating a new directory at the location below to store versioned installations\n ",vcpd,"\n",sep="")
       dir.create(vcpd)
     }
 

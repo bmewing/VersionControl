@@ -1,0 +1,13 @@
+{
+  "name": "Version Control Tutorial",
+  "version": "0.0.1",
+  "author": "Mark Ewing",
+  "description": "Tutorial on using the package VersionControl",
+  "main": "tutorial.R",
+  "packages": {
+    "coin": "1.1x"
+  },
+  "github": {
+    "r-lib/httr": "a68c86c8777b9ef9bf49b8fea7af356d44d92735"
+  }
+}

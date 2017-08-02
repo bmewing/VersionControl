@@ -1,15 +1,17 @@
 defaultLibrary = function(){
-  defaultLibrary = strsplit(normalizePath(.libPaths()[1]),"\\\\")[[1]]
+  defaultLibrary = strsplit(normalizePath(.libPaths()[1],winslash = "/"),"/")[[1]]
   return(paste(c(defaultLibrary[-length(defaultLibrary)],"VersionControl"),collapse=.Platform$file.sep))
 }
 
 availableVersions = function(package){
   pd = paste(defaultLibrary(),package,sep=.Platform$file.sep)
   versions = list.dirs(pd,recursive=FALSE,full.names=FALSE)
+  return(versions)
 }
 
 loadVersion = function(package,version){
   av = availableVersions(package)
+  avLib = paste(defaultLibrary(),package,version,sep=.Platform$file.sep)
   if(version %in% av) return(list(Version=version))
   if(grepl("x",version,ignore.case=TRUE)){
     version = gsub("x.*","",version)
