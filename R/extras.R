@@ -5,8 +5,12 @@ defaultLibrary = function(){
 
 availableVersions = function(package){
   pd = paste(defaultLibrary(),package,sep=.Platform$file.sep)
-  versions = list.dirs(pd,recursive=FALSE,full.names=FALSE)
-  return(versions)
+  versions = list.dirs(pd,full.names=TRUE,recursive=FALSE)
+  av = unlist(lapply(lapply(c(.libPaths(),versions),installed.packages),function(x){
+    tryCatch({x['dplyr','Version']},
+             error=function(x){NULL})
+    }))
+  return(av)
 }
 
 loadVersion = function(package,version){
@@ -31,7 +35,11 @@ packageArchive = function(package){
 
 checkForBinary = function(package,version,date,type,flexible){
   details = readLines(sprintf("https://mran.microsoft.com/snapshot/%s/web/packages/%s/index.html",date,package))
-  cv = gsub(sprintf("^.*?%s_(.*?)\\.zip.*$",package),"\\1",grep(sprintf("bin/%s/contrib/[0-9]\\.[0-9]+/%s_.*?\\.zip",type,package),details,value=TRUE))
+  if(type == "windows"){
+    cv = gsub(sprintf("^.*?%s_(.*?)\\.zip.*$",package),"\\1",grep(sprintf("bin/%s/contrib/[0-9]\\.[0-9]+/%s_.*?\\.zip",type,package),details,value=TRUE))
+  } else {
+    cv = gsub(sprintf("^.*?%s_(.*?)\\.zip.*$",package),"\\1",grep(sprintf("bin/%s/contrib/[0-9]\\.[0-9]+/%s_.*?\\.tgz",type,package),details,value=TRUE))
+  }
   if(flexible) return(substr(cv,1,nchar(version)) == version) else return(cv == version)
 }
 
