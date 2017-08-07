@@ -13,6 +13,21 @@ availableVersions = function(package){
   return(av)
 }
 
+vcAlreadyInstalled = function(package,version){
+  pd = paste(defaultLibrary(),package,sep=.Platform$file.sep)
+  versions = list.dirs(pd,full.names=TRUE,recursive=FALSE)
+  av = unlist(lapply(lapply(versions,installed.packages),function(x){
+    tryCatch({x['dplyr','Version']},
+             error=function(x){NULL})
+  }))
+  if(is.null(av)) return(FALSE)
+  if(grepl("x",version,ignore.case=TRUE)){
+    version = gsub("x.*","",version)
+    av = substr(av,1,nchar(version))
+  }
+  if(!(version %in% av)) return(FALSE) else return(TRUE)
+}
+
 loadVersion = function(package,version){
   av = availableVersions(package)
   avLib = paste(defaultLibrary(),package,version,sep=.Platform$file.sep)
@@ -20,7 +35,7 @@ loadVersion = function(package,version){
   if(grepl("x",version,ignore.case=TRUE)){
     version = gsub("x.*","",version)
     avS = substr(av,1,nchar(version))
-    if(!version %in% avS) return(list(Version="MISSING")) else return(list(Version=max(av[avS==version])))
+    if(!(version %in% avS)) return(list(Version="MISSING")) else return(list(Version=max(av[avS==version])))
   }
   return(list(Version="MISSING"))
 }
@@ -67,6 +82,7 @@ installVersion = function(package,version,type,wait){
       return(list(Date="NOT FOUND",Version="NOT FOUND"))
     }
   }
+  if(d < '2014-09-17') return(list(Date="TOO OLD",Version="TOO OLD"))
   binary = type %in% c('windows','macosx')
   od = d
   found = F

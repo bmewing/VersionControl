@@ -4,6 +4,7 @@
 #' @param version character vector of the required versions of packages which should be downloaded and installed.
 #' @param type character, indicating the type of package to download and install. Will be "source" by default unless you request "windows" for Windows binaries or "macosx" for MacOS X binaries.
 #' @param searchAhead numeric, indicating the number of days to search ahead in the MRAN when looking for a specific version and/or type.
+#' @param force binary, if the package already has the requested version installed, should it be installed again?
 #' @param ... arguments to to be passed to install.packages
 #' @return invisible NULL
 #' @details
@@ -16,7 +17,7 @@
 #' vcInstall(package = 'coin', version = '1.1-3', type = "source")
 #' @export
 
-vcInstall <- function(package,version,type=c("source","windows","macosx"),searchAhead=7,...) {
+vcInstall <- function(package,version,type=c("source","windows","macosx"),searchAhead=7,force=FALSE,...) {
   if(length(package) != length(version)) stop("Unequal number of Package Names and Version Numbers - must be one for one.")
   if(length(type) > 1) type = type[1]
   dl = defaultLibrary()
@@ -25,6 +26,11 @@ vcInstall <- function(package,version,type=c("source","windows","macosx"),search
     dir.create(dl)
   }
   for(i in seq_along(package)){
+    ai = vcAlreadyInstalled(package,version)
+    if(ai & !force) {
+      cat("'",package[i],"' has already been installed with version ",version[i],".\n",sep="") 
+      next
+    }
     vcpd = paste(dl,package[i],sep=.Platform$file.sep)
     if(!dir.exists(vcpd)){
       cat("This appears to be the first time the package '",package[i],"' has been installed with version control.\nCreating a new directory at the location below to store versioned installations\n ",vcpd,"\n",sep="")
@@ -33,6 +39,7 @@ vcInstall <- function(package,version,type=c("source","windows","macosx"),search
 
     mranDate = installVersion(package[i],version[i],type,searchAhead)
     if(mranDate$Version == "NOT FOUND") stop("Requested version cannot be found.")
+    if(mranDate$Version == "TOO OLD") stop("Requested version is older than MRAN supports. Cannot install.")
 
     vcpdv = paste(vcpd,mranDate$Version,sep=.Platform$file.sep)
     if(!dir.exists(vcpdv)){
